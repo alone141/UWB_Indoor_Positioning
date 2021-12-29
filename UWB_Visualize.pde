@@ -18,6 +18,8 @@ void draw(){
     anchor1 = new Anchor(0,0, "0,0");
     anchor2 = new Anchor(11,0, "11,0");
     anchor3 = new Anchor(0,6, "0,6");
+    anchor4 = new Anchor(0,6, "11,6");
+    anchor5 = new Anchor(0,6, "5,3");
     //anchor4 = new Anchor(11,6, "11,6");
     //anchor5 = new Anchor(5,3, "5,3");
 

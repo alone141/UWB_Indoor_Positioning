@@ -8,9 +8,9 @@ a_x = [0 11 0]; % X coordinates of anchors
 a_y = [0 0 6 6];  % Y coordinates of anchors
 
 % The real distance values without noise
-anchor_realdist = [8.546 4.247 8.542]; real = [8,3]; % Test case 1 (8,3) 
+% anchor_realdist = [8.546 4.247 8.542]; real = [8,3]; % Test case 1 (8,3) 
 %  anchor_realdist = [5.010 8.950 3.599]; real = [3,4]; % Test case 2 (3,4)
-% anchor_realdist = [10.82 6.33 9]; real = [9,6]; % Test case 3 (9,6)
+anchor_realdist = [10.82 6.33 9]; real = [9,6]; % Test case 3 (9,6)
 %  anchor_realdist = [1.423 10.044 5.094]; real = [1,1]; % Test case 4 (1,1)
 
 
@@ -76,16 +76,14 @@ legend('Y Pseudo','Y Tahmin')
 
 
 figure;
-% plot(d_x(end),d_y(end),'rx')
 scatter(d_x,d_y);
 hold on
-% plot(x_co(end),y_co(end),'bx');
 scatter(tahmin_x,tahmin_y);
 hold on
 plot(real(1),real(2),'ks');
 legend('pseudo','tahmin','gercek')
 title('Pozisyon Grafiği')
-axis([0 11 0 6])
+axis([0 12 0 7])
 
 figure;
 subplot(2,1,1);
