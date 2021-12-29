@@ -2,16 +2,18 @@ clear all;
 close all;
 
 N = 500; % Ölçüm sayısı
-sysorder = 8;
+sysorder = 5;
 mu = 0.0001;
 x_measured = zeros([1 N]);
-y_measured = zeros([1 N]); 
+y_measured = zeros([1 N]);
 d_ideal = [8.229 3.621 3.145 8.928 5.011]; real = [8,2]; % Test case 3 (8,2)
 d_measured = d_ideal + error; % Error ekleme
 anchorCount = 5;
 
 x_anchor = [0 11 5 0 11]; % Anchorlar x pozisyonları (biliniyor)
 y_anchor = [0 0 3 6 6];  % Anchorlar y pozisyonları (biliniyor)
+
+
 for n = 1:N
     d_ideal = [8.229 3.621 3.145 8.928 5.011]; real = [8,2]; % Test case 3 (8,2)
     d_measured(n,:) = d_ideal + error; % Error ekleme
@@ -44,7 +46,7 @@ scatter(x_measured,y_measured);
 hold on
 scatter(real(1),real(2),'ks');
 hold on
-scatter(estimated_x,estimated_y);
+scatter(estimated_x,estimated_y,'rs');
 
 
 
