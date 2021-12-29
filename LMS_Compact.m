@@ -5,7 +5,7 @@ N = 500; % Ölçüm sayısı
 sysorder = 8;
 mu = 0.0001;
 x_measured = zeros([1 N]);
-y_measured = zeros([1 N]);
+y_measured = zeros([1 N]); 
 d_ideal = [8.229 3.621 3.145 8.928 5.011]; real = [8,2]; % Test case 3 (8,2)
 d_measured = d_ideal + error; % Error ekleme
 anchorCount = 5;
