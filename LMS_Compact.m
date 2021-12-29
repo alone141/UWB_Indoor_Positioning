@@ -1,11 +1,7 @@
 clear all;
 close all;
 
-<<<<<<< HEAD
 N = 200; % Ölçüm sayısı
-=======
-N = 500; % Ölçüm sayısı
->>>>>>> 06612fc06c8912469cf62267834826dacc5904d4
 sysorder = 5;
 mu = 0.0001;
 x_measured = zeros([1 N]);
@@ -17,7 +13,6 @@ anchorCount = 5;
 x_anchor = [0 11 5 0 11]; % Anchorlar x pozisyonları (biliniyor)
 y_anchor = [0 0 3 6 6];  % Anchorlar y pozisyonları (biliniyor)
 
-<<<<<<< HEAD
 for k = 1:200 % k kere tekrar edip grafik çizdirmek için sadece
     
     for n = 1:N
@@ -52,13 +47,6 @@ for k = 1:200 % k kere tekrar edip grafik çizdirmek için sadece
     error_raw(k) = sqrt((real(1) - x_measured(n))^2 + (real(2) - y_measured(n))^2);
     k_x(k) = estimated_x;
     k_y(k) = estimated_y;
-=======
-
-for n = 1:N
-    d_ideal = [8.229 3.621 3.145 8.928 5.011]; real = [8,2]; % Test case 3 (8,2)
-    d_measured(n,:) = d_ideal + error; % Error ekleme
-    [x_measured(n),y_measured(n)] = multilateration(anchorCount,x_anchor,y_anchor,d_measured(n,:));
->>>>>>> 06612fc06c8912469cf62267834826dacc5904d4
 end
 
 % GRAFİKLER
@@ -67,15 +55,9 @@ scatter(x_measured,y_measured);
 hold on
 scatter(k_x(1:N),k_y(1:N));
 hold on
-<<<<<<< HEAD
 scatter(real(1),real(2),'ks');
 legend('Measured','Estimated(k Different estimations)','Real');
 title('Pozisyon Tahminleri');
-=======
-scatter(estimated_x,estimated_y,'rs');
-
-
->>>>>>> 06612fc06c8912469cf62267834826dacc5904d4
 
 figure;
 plot(e_x.^2);
@@ -106,10 +88,3 @@ x = I(1,1); % Ölçülen x
 y = I(2,1); % Ölçülen y
 
 end
-<<<<<<< HEAD
-=======
-
-% function y = LMS(N,mu,)
-%
-% end
->>>>>>> 06612fc06c8912469cf62267834826dacc5904d4
