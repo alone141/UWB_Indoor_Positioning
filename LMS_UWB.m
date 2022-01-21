@@ -1,103 +1,121 @@
 clear all;
 close all;
-FAIL=0;
 
-for k = 1:1000
+N = 1000;  % X ICIN 3 ANCHORDAN N KEZ ALINAN INPUTLAR
+mu = 0.00005; % Step size
+w = zeros([3 1]);  % Filtrenin ağırlık katsayıları
 
-a_x = [0 11 0]; % X coordinates of anchors
-a_y = [0 0 6 6];  % Y coordinates of anchors
+x_Anchor = [0 11 0]; % X coordinates of anchors
+y_Anchor = [0 0 6 6];  % Y coordinates of anchors
+distance_measured = zeros([N 3]); % Ölçülen uzaklık değerleri
+x_measured = zeros([1 N]); % Saf ölçümlerle hesaplanan x değerleri
+y_measured = zeros([1 N]); % Saf ölçümlerle hesaplanan y değerleri
+x_estimated = zeros([1 N]);% Algoritmadan tahmin edilen x değerleri
+y_estimated = zeros([1 N]);% Algoritmadan tahmin edilen x değerleri
+% error_value = zeros([1 N]);% Algoritmadan tahmin edilen x değerleri
+% Gerçek uzaklık değerleri
+%  distance_real = [8.546 4.247 8.542]; xy_tag = [8,3]; % Test case 1 (8,3)
+distance_real = [5.010 8.950 3.599]; xy_tag = [3,4]; % Test case 2 (3,4)
+%  distance_real = [10.82 6.33 9];      xy_tag = [9,6]; % Test case 3 (9,6)
+% distance_real = [1.423 10.044 5.094];xy_tag = [1,1]; % Test case 4 (1,1)
 
-% The real distance values without noise
-% anchor_realdist = [8.546 4.247 8.542]; real = [8,3]; % Test case 1 (8,3) 
-%  anchor_realdist = [5.010 8.950 3.599]; real = [3,4]; % Test case 2 (3,4)
-anchor_realdist = [10.82 6.33 9]; real = [9,6]; % Test case 3 (9,6)
-%  anchor_realdist = [1.423 10.044 5.094]; real = [1,1]; % Test case 4 (1,1)
-
-
-
-N = 50;  % X ICIN 3 ANCHORDAN N KEZ ALINAN INPUTLAR
-mu = 0.0005; % Step size
-% N = 500; mu = 0.0001;
-
-for i = 1:N
-    anchor_pseudodist(i,:) = anchor_realdist + error()'; % Adding noise
+for k = 1:500
+%     [x_tag_real,y_tag_real] = multilateration(x_Anchor,y_Anchor,distance_real);
+    distance_measured = distance_real + error; 
+    for n = 1:N
+        distance_measured(n,:) = distance_real + error; % Hata payı ekleme
+    end
+    [x_measured,y_measured] = multilateration(x_Anchor,y_Anchor,distance_measured); % Ölçülen x ve y değerleri
+    
+    w = zeros([3 1]); % Filtre ağırlık matrixi
+    for n = 1:N
+        x_estimated(n) = distance_measured(1,:)*w;  % Tahmin edilen değer
+        error_value(n) = x_measured(n) - x_estimated(n); % Hata deeğeri hesaplanması 
+        w = w + (mu*error_value(n)*distance_measured(1,:))'; % Hata değeri, step size ve inputa göre ağırlık matrixini güncelleme
+    end
+    
+    for n = 1:N
+        y_estimated(n) = distance_measured(1,:)*w;
+        error_value(n) = y_measured(n) - y_estimated(n);
+        w = w + (mu*error_value(n)*distance_measured(1,:))';
+    end
+    % K farklı tahminin hata payını kaydetme
+    FINAL_ESTIMATE_ERROR_DISTANCE(k) = sqrt((xy_tag(1)-x_estimated(end))^2 + (xy_tag(2) - y_estimated(end))^2);
+    FINAL_MEASURED_ERROR_DISTANCE(k) = sqrt((xy_tag(1)-x_measured(end))^2 + (xy_tag(2) - x_measured(end))^2);
 end
+% GRAFİKLER
 
-  A = 2*a_x(2) - 2*a_x(1);
-  B = 2*a_y(2) - 2*a_y(1);
-  C = anchor_pseudodist(:,1).^2 - anchor_pseudodist(:,2).^2 - a_x(1)^2 + a_x(2)^2 - a_y(1)^2 + a_y(2)^2;
-  D = 2*a_x(3) - 2*a_x(2);
-  E = 2*a_y(3) - 2*a_y(2);
-  F = anchor_pseudodist(:,2).^2 - anchor_pseudodist(:,3).^2 - a_x(2)^2 + a_x(3)^2 - a_y(2)^2 + a_y(3)^2;
-  d_x = (C*E - F*B) / (E*A - B*D);
-  d_y = (C*D - A*F) / (B*D - A*E);
-  
-sysorder = 3;
-x  = [anchor_pseudodist(:,1) anchor_pseudodist(:,2) anchor_pseudodist(:,3)];     % Input to the filter 
-d  = d_x;  % Desired signal = output of H + Uncorrelated noise signal
-w = zeros (sysorder, 1) ; % Initially filter weights are zero
-
-for n = 1 : N 
-    x_co(:,n)= x(n,:)*w; % output of the adaptive filter
-    e(n) = d(n) - x_co(n) ; % error signal = desired signal - adaptive filter output
-    w(:,1) = w(:,1) + (mu * x(n,:) * e(n)).' ; % filter weights update
-end 
-
-x  = [anchor_pseudodist(:,1) anchor_pseudodist(:,2) anchor_pseudodist(:,3)];     % Input to the filter 
-d  = d_y;  % Desired signal = output of H + Uncorrelated noise signal
-w = zeros (sysorder, 1) ; % Initially filter weights are zero
-
-for n = 1 : N 
-    y_co(:,n)= x(n,:)*w; % output of the adaptive filter
-    e(n) = d(n) - y_co(n) ; % error signal = desired signal - adaptive filter output
-    w(:,1) = w(:,1) + (mu * x(n,:) * e(n)).' ; % filter weights update
-end     
-psuedo_hata(k) = pdist([real;d_x(end), d_y(end)]);
-tahmin_hata(k) = pdist([real;x_co(end), y_co(end)]);
-
-tahmin_y(k) = y_co(end);
-tahmin_x(k) = x_co(end);
-if psuedo_hata(k)-tahmin_hata(k) < 0
-FAIL = FAIL+1;
-end
-end
-
-
-
-
-figure;
-plot(e);
-title('Error margin')
-figure;
-plot(d_y)
+figure; % X İterasyon vs Metre grafiği
+plot(x_measured);
 hold on
-plot(y_co);
-legend('Y Pseudo','Y Tahmin')
-
-
-figure;
-scatter(d_x,d_y);
+plot(x_estimated);
 hold on
-scatter(tahmin_x,tahmin_y);
-hold on
-plot(real(1),real(2),'ks');
-legend('pseudo','tahmin','gercek')
-title('Pozisyon Grafiği')
-axis([0 12 0 7])
+yline(xy_tag(1));
+title('Ölçülen X vs Tahmin Edilen X');
+legend('Ölçülen','Tahmin Edilen','Gerçek');
+xlabel('İterasyon'); 
+ylabel('Metre'); 
 
-figure;
+
+figure; % X ve Y İterasyon vs Metre grafiği
+plot(y_measured);
+hold on
+plot(y_estimated);
+hold on
+yline(xy_tag(2));
+title('Ölçülen Y vs Tahmin Edilen Y');
+legend('Ölçülen','Tahmin Edilen','Gerçek');
+xlabel('İterasyon'); 
+ylabel('Metre'); 
+
+
+figure; % Pozisyon Tahmin grafiği
+scatter(xy_tag(1),xy_tag(2), 'ks', 'filled');
+hold on
+scatter(x_measured,y_measured );
+hold on
+scatter(x_estimated(end),y_estimated(end), 'bd', 'filled');
+hold on
+scatter(x_measured(1),y_measured(1), 'rd', 'filled');
+xlabel('X Ekseni (Metre)'); 
+ylabel('Y Ekseni (Metre)'); 
+legend('Gerçek', 'N Ölçüm', 'Son Tahmin', 'İlk Ölçüm');
+title('Pozisyon Grafiği');
+
+figure; % Hata değerlerinin histogram grafiği
 subplot(2,1,1);
-histogram(psuedo_hata);
+histogram(FINAL_MEASURED_ERROR_DISTANCE);
+title('Birbirinden Bağımsız N Ölçümün Gerçek Değere Göre Hata Değerleri');
+xlabel('Metre'); 
+ylabel('Frekans'); 
 subplot(2,1,2);
-histogram(tahmin_hata);
+histogram(FINAL_ESTIMATE_ERROR_DISTANCE);
+title('Birbirinden Bağımsız N Tahminin Gerçek Değere Göre Hata Değerleri');
+xlabel('Metre'); 
+ylabel('Frekans'); 
 
-
-
+% En son tahmin edilen değerin hata payı
+FINAL_ESTIMATE_ERROR_DISTANCE = sqrt((xy_tag(1)-x_estimated(end))^2 + (xy_tag(2) - y_estimated(end))^2)
 
 function y= error % Error function
 % mean = -0.023;
 % stddev = 0.2;
 mean = -0.41;
 stddev = 0.62;
-y= randn(3,1)*stddev + mean; % Error margin with standard deviation and mean
+y= randn([1 3])*stddev + mean;
 end
+
+function [x_tag,y_tag] = multilateration(x_anchor,y_anchor,distance)
+
+
+A = 2*x_anchor(2) - 2*x_anchor(1);
+B = 2*y_anchor(2) - 2*y_anchor(1);
+C = distance(:,1).^2 - distance(:,2).^2 - x_anchor(1)^2 + x_anchor(2)^2 - y_anchor(1)^2 + y_anchor(2)^2;
+D = 2*x_anchor(3) - 2*x_anchor(2);
+E = 2*y_anchor(3) - 2*y_anchor(2);
+F = distance(:,2).^2 - distance(:,3).^2 - x_anchor(2)^2 + x_anchor(3)^2 - y_anchor(2)^2 + y_anchor(3)^2;
+x_tag = (C*E - F*B) / (E*A - B*D);
+y_tag = (C*D - A*F) / (B*D - A*E);
+
+end
+
