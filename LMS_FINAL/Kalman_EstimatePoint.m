@@ -1,5 +1,4 @@
 function tag_estimated = Kalman_EstimatePoint(expected_estimate_error,expected_measurement_error,input_coordinates)
-
 tag_estimated = [10 10];
 for n = 1:length(input_coordinates)
     kalman_gain = expected_estimate_error ./ (expected_estimate_error + expected_measurement_error);
