@@ -40,6 +40,7 @@ scatter(tag_real(1),tag_real(2),'ks' ,'filled');
 legend('LMS','Kalman','Gerçek')
 title('Pozisyon');
 
+
 figure;
 subplot(2,1,1);
 plot(gecicix);
