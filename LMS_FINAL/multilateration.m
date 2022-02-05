@@ -8,4 +8,5 @@ E = 2*y_anchor(3) - 2*y_anchor(2);
 F = distance(:,2).^2 - distance(:,3).^2 - x_anchor(2)^2 + x_anchor(3)^2 - y_anchor(2)^2 + y_anchor(3)^2;
 x_tag = (C*E - F*B) / (E*A - B*D);
 y_tag = (C*D - A*F) / (B*D - A*E);
+
 end
