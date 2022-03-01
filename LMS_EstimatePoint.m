@@ -17,27 +17,7 @@ for n = 1:N
     %Erroru azaltmak için gradientin tersi yönde bir adım atarak bir minimum arıyoruz 
     tag_estimated(1)=tag_estimated(1)-mu*diff_Ex;
     tag_estimated(2)=tag_estimated(2)-mu*diff_Ey;
-    
-    %Grafikler için -----
+
   
 end
-% 
-% figure;
-% subplot(2,1,1);
-% plot(xtemp);
-% yline(5);
-% legend('Tahmin','Gerçek');
-% title('LMS: X Ekseni');
-% ylabel('Metre');
-% 
-% ylim([0 10])
-% grid on
-% subplot(2,1,2);
-% plot(ytemp);
-% yline(8);
-% legend('Tahmin','Gerçek');
-% title('LMS: Y Ekseni');
-% ylabel('Metre');
-% ylim([0 10])
-% grid on
 end
