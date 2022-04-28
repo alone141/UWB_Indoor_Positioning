@@ -27,12 +27,24 @@ String deviceListText  = "";
 String messageSent     = "";
 String messageReceived = "";
 String hedefCihaz = "DW1756";
-
+float[] ya;
 Activity activity; //Arkaplan secimi iv
 Context context; 
 PImage img; 
 boolean image_loaded; 
-
+ int An0_distance=0;
+  int An1_distance=0;
+  int An2_distance=0;
+  int An3_distance=0;
+  String An0_hex="0";
+  String An1_hex="0";
+  String An2_hex="0";
+  String An3_hex="0";
+  float An0distance = 0;
+  float An1distance = 0;
+  float An2distance = 0;
+  float An3distance = 0;
+  float[] distance_array = {0,0,0,0};
 ControlP5 cp5;
 controlP5.Toggle dev_toggle, kalman_toggle, LMS_toggle;
 controlP5.Button Arkaplan_buton;
@@ -47,8 +59,8 @@ final float kalman_stddev = 0.4;
 float meterToPixel, mean_pixel, stddev_pixel; // Pixel ve metre degerlerini cevirebilmek icin sabit sayılar
 float kalman_var = kalman_stddev*kalman_stddev;
 /* Anchor ve uzaklik degerleri */
-Anchor anchor1, anchor2, anchor3, anchor4, anchor5;
-int[] x_Anchor = {0, 11, 0, 5, 11}, y_Anchor = {0, 0, 6, 3, 6}; // Anchor x y koordinatlari
+Anchor anchor1, anchor2, anchor3, anchor4;
+int[] x_Anchor = {0, 6, 0, 6}, y_Anchor = {0, 8, 8, 0}; // Anchor x y koordinatlari
 float[] distance_measured = {0, 0, 0, 0, 0};                    // Olculen uzakliklar
 
 /* Least Mean Square Parametreleri */
@@ -97,6 +109,7 @@ void onLocationPermission(boolean permitted) {
   }
 }
 void draw() { 
+
    updateDeviceListText();
 
   if (image_loaded && !devMode) {
@@ -105,7 +118,7 @@ void draw() {
   else{
     if(!devMode){
       background(arkaplan);
-      metrekare(11, 6);
+      metrekare(11, 8);
     }
   }
   /* Arka planin cizimi */
@@ -127,7 +140,6 @@ void draw() {
   anchor2 = new Anchor(x_Anchor[1], y_Anchor[1], "11,0");
   anchor3 = new Anchor(x_Anchor[2], y_Anchor[2], "0,6");
   anchor4 = new Anchor(x_Anchor[3], y_Anchor[3], "5,3");
-  anchor5 = new Anchor(x_Anchor[4], y_Anchor[4], "11,6");
   
   /* 60 frames per second programda her 6 framede bir kere data aliyoruz = 10 hz */
   if (frameCount % 6 == 0)
@@ -175,6 +187,8 @@ void draw() {
         appText += "\n\nlast message received:";
         appText += "\n string [" + messageReceived + "]";
         appText += "\n hex [" + toHexString(messageReceived) + "]";
+
+
       }
       else if (bleUart.isScanning()) {
         appText = "BLE is scanning...";
@@ -216,6 +230,7 @@ void draw() {
         LMS_toggle.hide();
         Arkaplan_buton.hide();
         ellipse(x_smooth + 10, y_smooth + 10, 0.2 * meterToPixel, 0.2 * meterToPixel);
+        print(position_estimate_KF[0] + " , " + position_estimate_KF[1]);
   }
   else{
     kalman_toggle.show();
@@ -296,10 +311,9 @@ void requestData()
     distance_measured[1] = anchor2.measure_distance();
     distance_measured[2] = anchor3.measure_distance();
     distance_measured[3] = anchor4.measure_distance();
-    distance_measured[4] = anchor5.measure_distance();
 
     /* Least mean square fonksiyonu 200 iterasyon - 0.1 step size */
-    position_estimate_LMS = LMS_EstimatePoint(distance_measured, x_Anchor, y_Anchor, 5);
+    position_estimate_LMS = LMS_EstimatePoint(ya/*distance_measured*/, x_Anchor, y_Anchor, 4);
 
     tempX = position_estimate_KF[0]*meterToPixel+10;
     tempY = position_estimate_KF[1]*meterToPixel+10;
@@ -386,7 +400,10 @@ void bleUARTDisconnected() {
 // callback for when a message is received through the UART
 // avoid doing heavy lifting here, just store the message and handle it during draw
 void bleUARTMessageReceived(String message) {
+
   println("bleUARTMessageReceived() <" + message + ">");
-  println("bleUARTMessageReceived() <" + toHexString(message)+ ">");
-  messageReceived = message;
+  println("bleUARTMessageReceived() <" + toHexString(message)+ ">" + "uzunluk: " + toHexString(message).length());
+  messageReceived = toHexString(message);
+    ya = decode_Hex(messageReceived);
+  print(ya.toString());
 }
